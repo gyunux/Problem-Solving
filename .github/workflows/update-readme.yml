@@ -1,0 +1,37 @@
+name: Update BJ Solved Count
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Update README
+        run: |
+          # 백준 문제 폴더의 개수를 셉니다.
+          # BaekjoonHub는 보통 '문제번호. 문제이름' 형태로 폴더를 생성합니다.
+          # '.'으로 시작하는 폴더(.git, .github 등)는 제외합니다.
+          PROBLEM_COUNT=$(find . -maxdepth 1 -type d ! -name ".*" | wc -l)
+
+          # README.md 파일 내의 주석 사이의 내용을 교체합니다.
+          sed -i "//,//c/\n### 푼 문제 수: ${PROBLEM_COUNT}개\n/" README.md
+
+      - name: Commit & Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          # 변경 사항이 있을 때만 커밋하도록 조건 추가
+          if ! git diff --staged --quiet; then
+            git commit -m "🤖 [Bot] README 푼 문제 수 업데이트: ${PROBLEM_COUNT}개"
+            git push
+          else
+            echo "변경 사항이 없어 커밋하지 않습니다."
+          fi
