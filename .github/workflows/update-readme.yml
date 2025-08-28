@@ -14,15 +14,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Count solved problems
+        id: count_step
         run: |
           # '백준' 폴더 내의 모든 하위 문제 폴더들의 총 개수를 셉니다.
-          # wc-l (X) -> wc -l (O)
           PROBLEM_COUNT=$(find ./백준 -mindepth 2 -type d | wc -l)
-          echo "PROBLEM_COUNT=${PROBLEM_COUNT}" >> $GITHUB_ENV
+          echo "count=${PROBLEM_COUNT}" >> $GITHUB_OUTPUT
 
       - name: Update README
         run: |
-          awk -v count="${{ env.PROBLEM_COUNT }}" '
+          # 이전 스텝에서 계산한 문제 개수(count)를 사용합니다.
+          awk -v count="${{ steps.count_step.outputs.count }}" '
             BEGIN { in_block=0 }
             // { print; in_block=0; next }
             // { print; printf "### 푼 문제 수: %d개\n", count; in_block=1; next }
@@ -35,7 +36,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add README.md
           if ! git diff --staged --quiet; then
-            git commit -m "🤖 [Bot] README 푼 문제 수 업데이트: ${{ env.PROBLEM_COUNT }}개"
+            git commit -m "🤖 [Bot] README 푼 문제 수 업데이트: ${{ steps.count_step.outputs.count }}개"
             git push
           else
             echo "변경 사항이 없어 커밋하지 않습니다."
