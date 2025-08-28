@@ -16,12 +16,12 @@ jobs:
       - name: Count solved problems
         run: |
           # '백준' 폴더 내의 모든 하위 문제 폴더들의 총 개수를 셉니다.
-          PROBLEM_COUNT=$(find ./백준 -mindepth 2 -type d | wc-l)
+          # wc-l (X) -> wc -l (O)
+          PROBLEM_COUNT=$(find ./백준 -mindepth 2 -type d | wc -l)
           echo "PROBLEM_COUNT=${PROBLEM_COUNT}" >> $GITHUB_ENV
 
       - name: Update README
         run: |
-          # 바로 이 awk 스크립트가 올바른 버전입니다.
           awk -v count="${{ env.PROBLEM_COUNT }}" '
             BEGIN { in_block=0 }
             // { print; in_block=0; next }
