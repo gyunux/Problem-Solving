@@ -15,23 +15,25 @@ jobs:
 
       - name: Count solved problems and update README
         run: |
-          # 백준 문제 폴더 개수를 셉니다. (숨김 폴더 및 파일 제외)
+          # --- 디버깅 시작 ---
+          echo "--- 현재 폴더 구조 ---"
+          ls -l
+          # --- 디버깅 끝 ---
+
+          # 백준 문제 폴더 개수를 셉니다.
+          # 만약 'solved' 같은 하위 폴더에 문제가 저장된다면, find ./solved ... 로 경로를 수정해야 합니다.
           PROBLEM_COUNT=$(find . -maxdepth 1 -type d ! -name '.*' | wc -l)
+
+          # --- 디버깅 시작 ---
+          echo "--- 스크립트가 계산한 문제 개수 ---"
+          echo "=> ${PROBLEM_COUNT}개"
+          # --- 디버깅 끝 ---
           
           # awk를 사용하여 README 파일의 특정 블록을 교체합니다.
           awk -v count="${PROBLEM_COUNT}" '
             BEGIN { in_block=0 }
-            // {
-              print;
-              in_block=0;
-              next
-            }
-            // {
-              print;
-              printf "### 푼 문제 수: %d개\n", count;
-              in_block=1;
-              next
-            }
+            // { print; in_block=0; next }
+            // { print; printf "### 푼 문제 수: %d개\n", count; in_block=1; next }
             !in_block { print }
           ' README.md > temp_README.md && mv temp_README.md README.md
 
