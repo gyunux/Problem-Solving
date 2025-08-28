@@ -3,4 +3,4 @@
 - Language : Java
 - Platform : Baekjoon,Programmers
 
-### 푼 문제 수: 0개
+### 푼 문제 수: 34개
