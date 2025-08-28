@@ -15,8 +15,21 @@ jobs:
 
       - name: Count solved problems and update README
         run: |
-          # '백준' 폴더 안에 있는 하위 폴더의 개수를 셉니다.
+          echo "--- (1) 최상위 폴더에 무엇이 있는지 확인합니다. ---"
+          ls -l .
+          echo "--------------------------------------------------"
+          echo ""
+
+          echo "--- (2) '백준' 폴더 안에 무엇이 있는지 확인합니다. (가장 중요!) ---"
+          # 만약 여기서 아무것도 안 나오면, 개수가 0으로 계산되는 원인입니다.
+          ls -l ./백준
+          echo "--------------------------------------------------"
+          echo ""
+
+          echo "--- (3) 위 내용을 바탕으로 문제 개수를 계산합니다. ---"
           PROBLEM_COUNT=$(find ./백준 -mindepth 1 -maxdepth 1 -type d | wc -l)
+          echo "=> 최종 계산된 문제 개수: ${PROBLEM_COUNT}개"
+          echo "--------------------------------------------------"
           
           # awk를 사용하여 README 파일의 특정 블록을 교체합니다.
           awk -v count="${PROBLEM_COUNT}" '
@@ -28,7 +41,6 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          # PROBLEM_COUNT 변수를 다음 스텝에서도 사용할 수 있도록 환경 변수로 저장합니다.
           echo "PROBLEM_COUNT=${PROBLEM_COUNT}" >> $GITHUB_ENV
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
